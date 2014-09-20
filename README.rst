@@ -39,7 +39,7 @@ all, so telling us about design issues or capabilities you want to see as
 issues in this respository is useful.
 
 Courteous feedback on the draft PEP as it comes together is welcomed at any
-point :).
+point :). Pull requests that update it to fix issues etc are even better.
 
 Writing code to implement / extend the draft we come up with is even better
 of course!
