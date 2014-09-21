@@ -48,3 +48,5 @@ Current status
 ==============
 
 We're just self assembling at the moment.
+
+We have a `requirements document<Requirements.rst>`_.
