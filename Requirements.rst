@@ -8,20 +8,20 @@ Requirements
 ============
 
 #. Support servers speaking HTTP/1.x, HTTP/2 and Websockets (potentially all on
-a single port).
+   a single port).
 #. Support graceful degradation for applications that can use HTTP/2 but still
-support HTTP/1.x requests.
+   support HTTP/1.x requests.
 #. Graceful incremental adoption path - no upgrade-all-components requirement
-baked into the design.
+   baked into the design.
 #. Support Python 2.7 and 3.x (where x is not yet discussed)
 #. Support the existing ecosystem of containers (such as mod_wsgi)
-new API. We want a clean, fast and approachable API, and we want to
-ensure that its no less friendly to work with than WSGI, for all that
-it will expose much more functionality.
+   new API. We want a clean, fast and approachable API, and we want to
+   ensure that its no less friendly to work with than WSGI, for all that
+   it will expose much more functionality.
 #. Apps need to be able to tell what protocol is in use, and what optional
-features are available. For instance, HTTP/2 PUSH PROMISE is an optional feature
-that can be disabled by clients. Websockets needs to expose a socket like
-object, and so on.
+   features are available. For instance, HTTP/2 PUSH PROMISE is an optional
+   feature that can be disabled by clients. Websockets needs to expose a socket
+   like object, and so on.
 #. Support websockets
 #. Support HTTP/2
 #. Support HTTP/1.x [ which may be just 'point at PEP-3333'. ]
@@ -30,13 +30,13 @@ Corollaries
 ===========
 
 #. May well want to use `python futures <http://python-futures.org>`_ to get
-bytes on Python 2.7.
+   bytes on Python 2.7.
 #. Will need old to new and new to old shims to enale upgrading one layer in
-a middleware stack at a time.
+   a middleware stack at a time.
 #. Cannot be coarsely incompatible with WSGI, or writing shims will be very
-fragile.
+   fragile.
 #. Cannot hand the connection socket to apps (pending confirmation from
-container authors).
+   container authors).
 
 Not requirements
 ================
