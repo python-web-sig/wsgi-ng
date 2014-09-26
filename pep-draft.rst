@@ -48,6 +48,11 @@ Differences to PEP \3333
 
 * Server push is defined - see ``wsgi.associated_content``.
 
+* The pending changes from
+  https://mail.python.org/pipermail/web-sig/2010-September/004655.html
+  have been applied, barring the point about ``wsgi.input`` and
+  ``CONTENT_LENGTH`` being out of sync which needs further discussion. 
+
 Original Rationale and Goals (from PEP \333)
 ============================================
 
@@ -518,6 +523,12 @@ sections on `The start_response() Callable`_ and `Error Handling`_.
 It is used only when the application has trapped an error and is
 attempting to display an error message to the browser.
 
+The ``start_response`` callable **must** do any header verification and
+checking that will take place before returning (or raising an error)
+rather than deferring it until body bytes are supplied (via either the
+iterator or the ``write`` callable). This ensures that the error is
+raised as close to the causing code as possible.
+
 The ``start_response`` callable must return a ``write(body_data)``
 callable that takes one positional parameter: a bytestring to be written
 as part of the HTTP response body.  (Note: the ``write()`` callable is
@@ -776,7 +787,7 @@ the following methods:
 Method               Stream      Notes
 ===================  ==========  ========
 ``read(size)``       ``input``   1
-``readline()``       ``input``   1, 2
+``readline(hint)``   ``input``   1, 2
 ``readlines(hint)``  ``input``   1, 3
 ``__iter__()``       ``input``
 ``flush()``          ``errors``  4
@@ -793,13 +804,14 @@ Reference, except for these notes as listed in the table above:
    The application **should not** attempt to read more data than is
    specified by the ``CONTENT_LENGTH`` variable.
 
-   A server **should** allow ``read()`` to be called without an argument,
-   and return the remainder of the client's input stream.
+   A server **must** allow ``read()`` to be called without an argument,
+   and return the remainder of the client's input stream. This implies
+   blocking until the stream source source is closed in HTTP/2.
 
-   A server **should** return empty bytestrings from any attempt to
+   A server **must** return empty bytestrings from any attempt to
    read from an empty or exhausted input stream.
 
-2. Servers **should** support the optional "size" argument to ``readline()``,
+2. Servers **must** support the optional "size" argument to ``readline()``,
    but as in WSGI 1.0, they are allowed to omit support for it.
 
    (In WSGI 1.0, the size argument was not supported, on the grounds that
@@ -807,9 +819,10 @@ Reference, except for these notes as listed in the table above:
    practice...  but then the ``cgi`` module started using it, and so
    practical servers had to start supporting it anyway!)
 
-3. Note that the ``hint`` argument to ``readlines()`` is optional for
-   both caller and implementer.  The application is free not to
-   supply it, and the server or gateway is free to ignore it.
+3. Note that the ``hint`` argument to ``readline`` and ``readlines()``
+   is optional for both caller and implementer.  The application is
+   free not to supply it, and the server or gateway is free to ignore
+   it.
 
 4. Since the ``errors`` stream may not be rewound, servers and gateways
    are free to forward write operations immediately, without buffering.
@@ -881,7 +894,7 @@ sending them, and raise an error if they are supplied to
 ``start_response()``.  (For more specifics on "hop-by-hop" features and
 headers, please see the `Other HTTP Features`_ section below.)
 
-Servers **should** check for errors in the headers at the time
+Servers **must** check for errors in the headers at the time
 ``start_response`` is called, so that an error can be raised while
 the application is still running.
 
@@ -956,7 +969,7 @@ Handling the ``Content-Length`` Header
 
 If the application supplies a ``Content-Length`` header, the server
 **should not** transmit more bytes to the client than the header
-allows, and **should** stop iterating over the response when enough
+allows, and **must** stop iterating over the response when enough
 data has been sent, or raise an error if the application tries to
 ``write()`` past that point.  (Of course, if the application does
 not provide *enough* data to meet its stated ``Content-Length``,
