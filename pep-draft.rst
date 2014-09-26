@@ -46,6 +46,8 @@ Differences to PEP \3333
 
 * Pre 2.2 support advice removed.
 
+* Server push is defined - see ``wsgi.associated_content``.
+
 Original Rationale and Goals (from PEP \333)
 ============================================
 
@@ -670,67 +672,91 @@ In addition to the CGI-defined variables, the ``environ`` dictionary
 **may** also contain arbitrary operating-system "environment variables",
 and **must** contain the following WSGI-defined variables:
 
-=====================  ===============================================
-Variable               Value
-=====================  ===============================================
-``wsgi.version``       The tuple ``(1, 0)``, representing WSGI
-                       version 1.0.
+=========================== ===============================================
+Variable                    Value
+=========================== ===============================================
+``wsgi.version``            The tuple ``(1, 0)``, representing WSGI
+                            version 1.0.
 
-``wsgi.url_scheme``    A string representing the "scheme" portion of
-                       the URL at which the application is being
-                       invoked.  Normally, this will have the value
-                       ``"http"`` or ``"https"``, as appropriate.
+``wsgi.url_scheme``         A string representing the "scheme" portion of
+                            the URL at which the application is being
+                            invoked.  Normally, this will have the value
+                            ``"http"`` or ``"https"``, as appropriate.
 
-``wsgi.input``         An input stream (file-like object) from which
-                       the HTTP request body bytes can be read.  (The server
-                       or gateway may perform reads on-demand as
-                       requested by the application, or it may pre-
-                       read the client's request body and buffer it
-                       in-memory or on disk, or use any other
-                       technique for providing such an input stream,
-                       according to its preference.)
+``wsgi.input``              An input stream (file-like object) from which
+			    the HTTP request body bytes can be read.
+			    (The server or gateway may perform reads
+			    on-demand as requested by the application,
+			    or it may pre-read the client's request
+			    body and buffer it in-memory or on disk,
+			    or use any other technique for providing
+			    such an input stream, according to its
+			    preference.)
 
-``wsgi.errors``        An output stream (file-like object) to which
-                       error output can be written, for the purpose of
-                       recording program or other errors in a
-                       standardized and possibly centralized location.
-                       This should be a "text mode" stream; i.e.,
-                       applications should use ``"\n"`` as a line
-                       ending, and assume that it will be converted to
-                       the correct line ending by the server/gateway.
+``wsgi.errors``             An output stream (file-like object) to which
+                            error output can be written, for the purpose of
+                            recording program or other errors in a
+                            standardized and possibly centralized location.
+                            This should be a "text mode" stream; i.e.,
+                            applications should use ``"\n"`` as a line
+                            ending, and assume that it will be converted to
+                            the correct line ending by the server/gateway.
 
-                       (On platforms where the ``str`` type is unicode,
-                       the error stream **should** accept and log
-                       arbitary unicode without raising an error; it
-                       is allowed, however, to substitute characters
-                       that cannot be rendered in the stream's encoding.)
+                            (On platforms where the ``str`` type is unicode,
+                            the error stream **should** accept and log
+                            arbitary unicode without raising an error; it
+                            is allowed, however, to substitute characters
+                            that cannot be rendered in the stream's encoding.)
 
-                       For many servers, ``wsgi.errors`` will be the
-                       server's main error log. Alternatively, this
-                       may be ``sys.stderr``, or a log file of some
-                       sort.  The server's documentation should
-                       include an explanation of how to configure this
-                       or where to find the recorded output.  A server
-                       or gateway may supply different error streams
-                       to different applications, if this is desired.
+                            For many servers, ``wsgi.errors`` will be the
+                            server's main error log. Alternatively, this
+                            may be ``sys.stderr``, or a log file of some
+                            sort.  The server's documentation should
+                            include an explanation of how to configure this
+                            or where to find the recorded output.  A server
+                            or gateway may supply different error streams
+                            to different applications, if this is desired.
 
-``wsgi.multithread``   This value should evaluate true if the
-                       application object may be simultaneously
-                       invoked by another thread in the same process,
-                       and should evaluate false otherwise.
+``wsgi.multithread``        This value should evaluate true if the
+                            application object may be simultaneously
+                            invoked by another thread in the same process,
+                            and should evaluate false otherwise.
 
-``wsgi.multiprocess``  This value should evaluate true if an
-                       equivalent application object may be
-                       simultaneously invoked by another process,
-                       and should evaluate false otherwise.
+``wsgi.multiprocess``       This value should evaluate true if an
+                            equivalent application object may be
+                            simultaneously invoked by another process,
+                            and should evaluate false otherwise.
 
-``wsgi.run_once``      This value should evaluate true if the server
-                       or gateway expects (but does not guarantee!)
-                       that the application will only be invoked this
-                       one time during the life of its containing
-                       process.  Normally, this will only be true for
-                       a gateway based on CGI (or something similar).
-=====================  ===============================================
+``wsgi.run_once``           This value should evaluate true if the server
+                            or gateway expects (but does not guarantee!)
+                            that the application will only be invoked this
+                            one time during the life of its containing
+                            process.  Normally, this will only be true for
+                            a gateway based on CGI (or something similar).
+
+``wsgi.associated_content`` This is a function which can be called
+			    whenever the application wishes to signal
+			    that some associated content should be
+			    pushed to the client. Server push is an
+			    HTTP/2 feature: if the connection is not
+			    able to provide server push, this will be
+			    a no-op. The function takes one required
+			    parameter, the encoded URL to the object
+			    to push. An optional parameter weight can
+			    be used to override the weight (HTTP/2
+			    section 5.3).
+			    Different gateways/servers may implement
+			    associated_content to suite their
+			    environment. For instance, if mod_spdy is
+			    being used with Apache and mod_wsgi, the
+			    header ``X-Associated-Content`` may be
+			    added when the object headers are sent
+			    (making calling this after start_response
+			    have no effect). In gateways that
+			    implement HTTP/2 themselves, calling the
+			    function may trigger an immediate
+			    ``PUSH_PROMISE`` on the connection socket.
+=========================== ===============================================
 
 Finally, the ``environ`` dictionary may also contain server-defined
 variables.  These variables should be named using only lower-case
