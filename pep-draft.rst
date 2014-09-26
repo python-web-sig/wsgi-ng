@@ -689,8 +689,8 @@ and **must** contain the following WSGI-defined variables:
 =========================== ===============================================
 Variable                    Value
 =========================== ===============================================
-``wsgi.version``            The tuple ``(1, 0)``, representing WSGI
-                            version 1.0.
+``wsgi.version``            The tuple ``(2, 0)``, representing WSGI
+                            version 2.0.
 
 ``wsgi.url_scheme``         A string representing the "scheme" portion of
                             the URL at which the application is being
