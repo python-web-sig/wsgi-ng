@@ -814,7 +814,7 @@ Reference, except for these notes as listed in the table above:
    A server **must** return empty bytestrings from any attempt to
    read from an empty or exhausted input stream.
 
-2. Servers **must** support the optional "size" argument to ``readline()``.
+2. Servers **must** support the optional ``hint`` argument to ``readline()``.
 
 3. Note that the ``hint`` argument to ``readline`` and ``readlines()``
    is optional for both caller and implementer.  The application is
