@@ -51,7 +51,10 @@ Differences to PEP \3333
 * The pending changes from
   https://mail.python.org/pipermail/web-sig/2010-September/004655.html
   have been applied, barring the point about ``wsgi.input`` and
-  ``CONTENT_LENGTH`` being out of sync which needs further discussion. 
+  ``CONTENT_LENGTH`` being out of sync which needs further discussion.
+
+* Prose about the interaction of chunking and ``CONTENT_LENGTH``
+  corrected.
 
 Original Rationale and Goals (from PEP \333)
 ============================================
@@ -991,8 +994,8 @@ by the iterable.
 
 And, if the server and client both support HTTP/1.1 "chunked
 encoding" [3]_, then the server **may** use chunked encoding to send
-a chunk for each ``write()`` call or bytestring yielded by the iterable,
-thus generating a ``Content-Length`` header for each chunk.  This
+a chunk for each ``write()`` call or bytestring yielded by the
+iterable, thus not using a ``Content-Length`` header at all.  This
 allows the server to keep the client connection alive, if it wishes
 to do so.  Note that the server **must** comply fully with RFC 2616
 when doing this, or else fall back to one of the other strategies for
