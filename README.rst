@@ -52,3 +52,5 @@ We're just self assembling at the moment.
 We have a `requirements document <Requirements.rst>`_.
 
 We have a `draft PEP based on 3333 <pep-draft.rst>`_.
+
+We may add some `experiments too <experiments.rst>`.

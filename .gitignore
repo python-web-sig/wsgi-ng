@@ -56,3 +56,7 @@ target/
 # Editors
 .*.swp
 *~
+
+AUTHORS
+ChangeLog
+.testrepository
