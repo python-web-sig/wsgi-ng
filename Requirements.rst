@@ -25,6 +25,8 @@ Requirements
 #. Support websockets
 #. Support HTTP/2
 #. Support HTTP/1.x [ which may be just 'point at PEP-3333'. ]
+#. Continue to support lightweight shims being built on top such as
+   https://github.com/Pylons/webob/blob/master/webob/request.py
 
 Corollaries
 ===========
